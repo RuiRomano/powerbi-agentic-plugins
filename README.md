@@ -23,6 +23,14 @@
 
 ```
 
+### For VS Code GitHub Copilot chat
+
+Install the plugins using Copilot CLI or download the repo skills to a folder of your choice.
+
+Configure [VS Code skills](vscode://settings/chat.agentSkillsLocations) to the skill folder:
+
+![vs-code-settings-skills](assets/images/vs-code-settings-skills.png)
+
 ## Scenarios
 
 TODO
