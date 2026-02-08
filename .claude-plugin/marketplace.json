@@ -11,10 +11,6 @@
         {
             "name": "powerbi-agentic",
             "source": "./powerbi-agentic"
-        },
-        {
-            "name": "fabric-cli",
-            "source": "./fabric-cli"
-        }       
+        }
     ]
 }

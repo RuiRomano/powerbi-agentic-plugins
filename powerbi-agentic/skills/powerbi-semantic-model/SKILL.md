@@ -7,9 +7,10 @@ description: Guide to develop Power BI Semantic Models. Use this skill when aske
 
 This skill provides guidance on how to develop Power BI semantic models.
 
-## Critical
+## IMPORTANT
 
-- Check if the `powerbi-modeling-mcp` MCP Server is available. If it is, prefer to use it instead of editing or creating *.tmdl files directly.
+- Check if the `powerbi-modeling-mcp` MCP Server is available. If it is, prefer to use it instead of editing or creating *.tmdl files directly. 
+- Remember that you can use the MCP tools against local TMDL folder by using the `database_operations` tool with `ConnectFolder` operation.
 
 ## Task: Connect to an existing semantic model
 
@@ -26,7 +27,7 @@ A semantic model can be loaded from the following locations:
 
 ## Task: Create a new Direct Lake model
 
-- Connect to the OneLake data sources (e.g. Lakehouse) and understand the schema. If you don't have any specific OneLake tools, you can use the Fabric CLI that has commands to explore OneLake tables
+- Connect to the OneLake data sources (e.g. Lakehouse) and understand the schema. If you don't have any specific OneLake tools, you can use the `fabric-cli` skill to explore the OneLake data.
 - Use the Power BI Modeling MCP Server to create a new offline database with compatibility level 1604 or higher
 - Using the schema from the lakehouse add the semantic model tables using EntitySourcePartition (see [direct-lake-guidelines](references/direct-lake-guidelines.md)) 
 - Follow modeling guidelines in [modeling-guidelines](references/modeling-guidelines.md)
@@ -43,20 +44,20 @@ A semantic model can be loaded from the following locations:
 
 ## Task: Run Best Practice Analysis (BPA) rules
 
-Run the script `scripts/bpa.ps1` against the semantic model.
+Run the script `scripts/bpa.ps1` against the semantic model if no specifuc BPA rules are mentioned use the default set of rules in `scripts/bpa-rules-semanticmodel.json`
 
 **CRITICAL:** 
 - If there is no semantic model in the context, prompt the user for the location of the semantic model.
 - If the model is stored on your local file system, ensure you select a folder that contains either a database.tmdl, model.tmdl, or model.bim file.
 
 ```powershell
-scripts/bpa.ps1 -models [path to the semantic model]
+scripts/bpa.ps1 -models [path to the semantic model] -rulesFilePath [path to the BPA rules json file]
 ```
 
 If the model is running in a local or remote server, call the script like this:
 
 ```powershell
-scripts/bpa.ps1 -models [server:port database]
+scripts/bpa.ps1 -models [server:port database] -rulesFilePath [path to the BPA rules json file]
 ```
 
 Report findings with severity levels (Critical, High, Medium, Info)

@@ -3,7 +3,9 @@ param (
     .PARAMETER models
     Specifies the path to the TMDL (Tabular Model Definition Language) definition of a semantic model or a server database.    
     #>
-    $models = @("localhost:50106 5d60b0e7-5a0f-45ba-8be2-1d38f59032a8", "C:\Users\ruiromano\temp\Sales.SemanticModel\definition")        
+    $models = @("localhost:50106 5d60b0e7-5a0f-45ba-8be2-1d38f59032a8", "C:\Users\ruiromano\temp\Sales.SemanticModel\definition") 
+    ,
+    $rulesFilePath = $null
 )
   
 $currentFolder = (Split-Path $MyInvocation.MyCommand.Definition -Parent)
@@ -45,19 +47,20 @@ foreach ($tool in $tools) {
 }
 
 $tabularEditorEXE = "$toolsPath\TabularEditor\TabularEditor.exe"
-$tabularEditorRulesPath = "$currentFolder\bpa-rules-semanticmodel.json"
 
-if (!(Test-Path $tabularEditorRulesPath)) {
+if ($rulesFilePath -eq $null) {
+    $rulesFilePath = "$currentFolder\bpa-rules-semanticmodel.json"
+}
 
-    Write-Host "Using default rules for Tabular Editor"
-    $tabularEditorRulesPath = "$toolsPath\TabularEditor\defaultRules.json"
+if (!(Test-Path $rulesFilePath)) {
+    throw "Cannot find BPA rules file at path: '$rulesFilePath'. Please provide a valid path to the BPA rules file"    
 }
 
 foreach ($model in $models) {
 
     Write-Host "Running Tabular Editor BPA rules for: '$model'"
 
-    $process = Start-Process -FilePath $tabularEditorEXE -ArgumentList "$model -A ""$tabularEditorRulesPath"" -G" -NoNewWindow -Wait -PassThru    
+    $process = Start-Process -FilePath $tabularEditorEXE -ArgumentList "$model -A ""$rulesFilePath"" -G" -NoNewWindow -Wait -PassThru    
 
     if ($process.ExitCode -ne 0) {
         #throw "Detected critical errors for model: '$model'"

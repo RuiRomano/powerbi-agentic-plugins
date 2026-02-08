@@ -16,10 +16,6 @@
 **Install plugins**
 
 ```
-# Install Fabric-CLI plugin
-
-/plugin marketplace add data-goblin/fabric-cli-plugin
-/plugin install fabric-cli-plugin@fabric-cli-plugin
 
 # Install powerbi-agentic-development plugin
 /plugin marketplace add C:\@\Repos\Github\powerbi-agentic-development

@@ -11,7 +11,7 @@
 
 ## Process to create a direct lake model
 
-- Create a named expression for the Direct Lake connection to the OneLake source.
+- Create a named expression for the Direct Lake connection to the OneLake source using the `AzureStorage.DataLake` connector. Do not use the `Sql.Database` unless explicitly asked for.
 - Analyze the schema of the tables in OneLake
 - Create tables with columns and types matching the OneLake tables and using `EntityPartitionSource` type for the partition.
 - If there is a development workspace, deploy to it to test
