@@ -1,5 +1,5 @@
 {
-  "name": "powerbi-agentic",
+  "name": "powerbi-plugin",
   "version": "0.1.0",
   "description": "Skills and tools for agentic Power BI development including Semantic Modeling, TMDL, PBIR, Best Practices.",
   "author": {

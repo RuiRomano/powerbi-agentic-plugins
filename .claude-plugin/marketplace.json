@@ -1,5 +1,5 @@
 {
-    "name": "powerbi-agentic-plugins",
+    "name": "powerbi-plugins",
     "owner": {
         "name": "Rui Romano"
     },
@@ -9,8 +9,8 @@
     },
     "plugins": [
         {
-            "name": "powerbi-agentic",
-            "source": "./powerbi-agentic"
+            "name": "powerbi-plugin",
+            "source": "./powerbi-plugin"
         }
     ]
 }

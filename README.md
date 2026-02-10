@@ -17,9 +17,9 @@
 
 ```
 
-# Install powerbi-agentic-development plugin
-/plugin marketplace add C:\@\Repos\Github\powerbi-agentic-development
-/plugin install powerbi-agentic@powerbi-agentic-plugins
+# Install powerbi-plugins
+/plugin marketplace add RuiRomano/powerbi-plugins
+/plugin install powerbi@powerbi-plugins
 
 ```
 
