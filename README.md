@@ -27,7 +27,14 @@ Configure [VS Code skills](vscode://settings/chat.agentSkillsLocations) to the s
 
 ## Scenarios
 
-TODO
+### New Direct Lake semantic model on top of Lakehouse tables
+
+- Create a new Lakehouse in Fabric
+- Load it with sample retail data
+- Prompt
+    ```
+    Create a new direct lake semantic model in workspace [workspace] that uses the tables from lakehouse [lakehouse]
+    ```
 
 ## No Warranty / Limitation of Liability
 
