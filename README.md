@@ -1,4 +1,4 @@
-# powerbi-agentic-development
+# powerbi-agentic-plugins
 
 ## Pre-Requisites
 
