@@ -51,12 +51,20 @@ Configure [VS Code skills](vscode://settings/chat.agentSkillsLocations) to the s
 
 ### New Direct Lake semantic model on top of Lakehouse tables
 
-- Create a new Lakehouse in Fabric
-- Load it with sample retail data
-- Prompt
-    ```
-    Create a new direct lake semantic model in workspace [workspace] that uses the tables from lakehouse [lakehouse]
-    ```
+```
+# 1. Create a Lakehouse in Microsoft Fabric
+# 2. Load it with some sample data, e.g. Retail sample data
+# 3. Prompt the following in Copilot CLI:
+> Create a new direct lake semantic model in workspace [workspace] that uses the tables from lakehouse [lakehouse]
+```
+
+### Semantic Model on top of CSV data
+
+```
+# Prompt the following in Copilot CLI:
+Use the powerbi-semantic-model skill to create a new semantic model based on the CSV files located in \assets\sample-data. Apply standard modeling best practices throughout (e.g., proper relationships, naming conventions, data types, and star schema design). 
+Using PBIR also create a sample report on top of the semantic model.
+```
 
 ## No Warranty / Limitation of Liability
 
