@@ -97,9 +97,9 @@ Example of a `[name].pbip` file:
     "version": "1.0",
     "artifacts": [
         {
-        "report": {
-            "path": "{Name of the Semantic Model}.Report"
-        }
+          "report": {
+              "path": "{Name of the Semantic Model}.Report"
+          }
         }
     ],
     "settings": {
