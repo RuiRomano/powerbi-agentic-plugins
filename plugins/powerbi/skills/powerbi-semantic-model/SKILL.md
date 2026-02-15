@@ -143,6 +143,12 @@ Load [dax-udf-functions-guidelines](references/dax-udf-functions-guidelines.md) 
 
 Before writing the DAX query, load [dax-query-guidelines](references/dax-query-guidelines.md) 
 
+## Task: Optimize DAX measures for performance
+
+- Create the optimized version of the measure side by side with the original one.
+- Find a DAX query to ensure the optimized version returns the same results as the original one.
+- Execute a query trace using MCP server to confirm if the optimized version has better performance.
+
 ## Task: Open Semantic Model from PBIP
 
 **CRITICAL:** Make sure you understand the PBIP structure in [pbip.md](references/pbip.md).
