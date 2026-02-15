@@ -131,6 +131,14 @@ Report findings with severity levels (Critical, High, Medium, Info).
 2. Use the `fabric-cli` skill to deploy the semantic model item to the target workspace.
 3. Verify the item appears in the workspace.
 
+## Task: Refactor Measures Using DAX UDFs to Centralize and Reuse Business Logic
+
+Load [DAX-UDF-Functions](references/DAX-UDF-Functions.md) to understand how to create and use DAX User-Defined Functions (UDFs).
+
+1. Make sure you understand the pattern to be included in the UDF function definition, including the use of type hints, parameter modes, and AnyRef for references.
+2. Create the UDF function
+3. Refactor existing measures to call the UDF instead of containing duplicated logic.
+
 ## Task: Open Semantic Model from PBIP
 
 **CRITICAL:** Make sure you understand the PBIP structure in [pbip.md](references/pbip.md).
