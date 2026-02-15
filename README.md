@@ -21,19 +21,12 @@ Each plugin bundles the skills, tools, and agents for a specific area of the Mic
 
 - Install [GitHub Copilot CLI](https://github.com/features/copilot/cli)
 - Install [Fabric CLI](https://microsoft.github.io/fabric-cli/)
-- Download [Power BI Modeling MCP](https://github.com/microsoft/powerbi-modeling-mcp)
 
 ### Copilot CLI
 
 ```bash
 # Open GitHub Copilot CLI
 copilot
-
-# Register the Power BI Modeling MCP server
-/mcp add
-    - name: powerbi-modeling-mcp
-    - type: stdio
-    - command: [path to download folder]\powerbi-modeling-mcp.exe --start
 
 # Add the marketplace (one-time setup)
 /plugin marketplace add RuiRomano/powerbi-agentic-plugins

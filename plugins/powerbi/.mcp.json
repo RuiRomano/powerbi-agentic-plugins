@@ -3,6 +3,15 @@
         "powerbi-service-query-mcp": {
             "type": "http",
             "url": "https://api.fabric.microsoft.com/v1/mcp/powerbi"
+        },
+        "powerbi-modeling-mcp": {
+            "command": "${CLAUDE_PLUGIN_ROOT}\\servers\\powerbi-modeling-mcp\\powerbi-modeling-mcp.exe",
+            "args": [
+                "--start"
+            ],
+            "env": {
+                "PBI_MODELING_MCP_CLIENT_ID": "ea0616ba-638b-4df5-95b9-636659ae5121"
+            }
         }
     }
 }
