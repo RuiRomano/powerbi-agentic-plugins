@@ -13,7 +13,7 @@ Always read these sections fully before starting any optimization session:
 - **[Phase 2: Optimization Iterations](#phase-2-optimization-iterations)** — apply, test, compare, iterate
 - **[Section 1: How the Engine Works](#section-1-how-the-engine-works)** — FE/SE architecture, xmSQL, segments, fusion
 - **[Section 2: Trace Diagnostics](#section-2-reading-and-diagnosing-traces)** — metrics, event waterfall, signal interpretation
-- **[Section 3: Tier 1 — DAX Patterns](#section-3-tier-1-dax-optimization-patterns)** — DAX001–DAX020 (auto-apply, no approval needed)
+- **[Section 3: Tier 1 — DAX Patterns](#section-3-tier-1-dax-optimization-patterns)** — DAX001–DAX021 (auto-apply, no approval needed)
 
 ### Consult When Needed
 
@@ -34,7 +34,7 @@ Use to prioritize *where to start* within sections, not to skip them. Section 3 
 | Signal | Start With |
 |--------|------------|
 | `CallbackDataID` or `EncodeCallback` in xmSQL | DAX002, DAX007, DAX008, DAX018 (highest priority) |
-| `ADDCOLUMNS` or `SUMMARIZE` in measure expression | DAX002 |
+| `ADDCOLUMNS` or `SUMMARIZE` in measure expression | DAX002, DAX006 |
 | `SUMMARIZE` with complex or filtered table as first argument | DAX005 |
 | `SUMX(VALUES(col), CALCULATE(...))` pattern in measure | DAX006 |
 | Same measure evaluated multiple times | DAX003 |
@@ -50,8 +50,9 @@ Use to prioritize *where to start* within sections, not to skip them. Section 3 
 | Near-identical SE queries on same fact table differing only by a column filter value or by per-measure `VAND` tuple predicates | DAX017 |
 | Bidirectional or M2M relationship causing unexpected SE join expansion, or existing `TREATAS`/`CROSSFILTER` in measure | DAX016 |
 | High-cardinality iterator (many distinct rows, low-cardinality attribute) | DAX015 |
+| `TREATAS` or `IN` re-filtering same fact with a computed key set; or large compound-tuple semi-join in xmSQL | DAX021 |
 
-> No signal matches? Read all of §3 — patterns DAX001–DAX020 cover the full range.
+> No signal matches? Read all of §3 — patterns DAX001–DAX021 cover the full range.
 
 ### Sections 4–6 — Escalation Triggers
 
@@ -128,11 +129,10 @@ This context helps distinguish model design issues (missing star schema, bidirec
 For each run:
 
 1. **Clear cache** → `dax_query_operations` ClearCache.
-2. **Execute** → `dax_query_operations` Execute with `GetExecutionMetrics=true`. Returns `CalculatedExecutionMetrics` (TotalDuration, FEDuration, SEDuration, SEQueryCount, SECpuTime, CacheMatches) and `ReportedExecutionMetrics`.
-3. **Fetch trace events immediately** → `trace_operations` Fetch. Returns SE events with xmSQL and per-query duration/CpuTime. **Fetch after each execution — the next Execute call will clear them.**
-4. Record TotalDuration and all metrics.
+2. **Execute** → `dax_query_operations` Execute with `GetExecutionMetrics=true`. Returns `CalculatedExecutionMetrics`, `ReportedExecutionMetrics`, trace events (embedded JSON), and query results (embedded CSV). **Read all embedded resources in the response.**
+3. Record TotalDuration, all metrics, and save the baseline CSV for semantic equivalence checks.
 
-After all runs: discard warm-up, take the **fastest** of the 2 measured runs as the baseline. Record its full metrics and trace events.
+After all runs: discard warm-up, take the **fastest** of the 2 measured runs as the baseline. Record its full metrics, trace events, and CSV result.
 
 **Isolating measures:** When a query has many measures and the trace is noisy, comment out all but one (or a small group), re-run, and compare. Repeat in groups to isolate which measures drive the majority of total duration.
 
@@ -146,7 +146,7 @@ Apply **Section 2: Trace Diagnostics** to interpret the metrics and events. Use 
 
 ### Step 1: Select and Apply Optimizations
 
-Using Section 3 (Tier 1), identify DAX patterns present in the baseline measures. Apply one or more of DAX001–DAX020.
+Using Section 3 (Tier 1), identify DAX patterns present in the baseline measures. Apply one or more of DAX001–DAX021.
 
 **CRITICAL:** Modify only the **measure definitions in the DEFINE block**. Do NOT change the EVALUATE clause or SUMMARIZECOLUMNS grouping columns. Query structure must stay identical to preserve semantic equivalence.
 
@@ -163,18 +163,18 @@ DEFINE
 ### Step 2: Execute and Compare
 
 1. `dax_query_operations` ClearCache
-2. `dax_query_operations` Execute with `GetExecutionMetrics=true`
-3. `trace_operations` Fetch
+2. `dax_query_operations` Execute with `GetExecutionMetrics=true`.
 
 **During iteration:** 1 run is sufficient — columns are already resident from baseline. Reserve the full 3-run protocol (1 warm-up + 2 measured) for the **final confirmation** against the original baseline.
 
 **Evaluate:**
 - **Improvement = (BaselineDuration − OptimizedDuration) / BaselineDuration × 100**
-- **Semantic equivalence:** same row count, same columns, same data values. If results differ, the change modified calculation semantics — revert it.
+- **Semantic equivalence:** Compare the CSV result from this run against the baseline CSV — same row count, same columns, same data values. If results differ, the change modified calculation semantics — revert it. Check this **immediately** after each iteration, not after multiple changes.
 
 ### Step 3: Iterate and Escalate
 
 - **≥10% improvement + semantically equivalent** → Success. Present optimized query and improvement to user. Offer to use it as new baseline for further rounds (compound improvements are common).
+- **Further rounds:** When the user opts to continue, re-run Phase 1 Steps 3–4 on the new baseline. The optimized query has different structure — re-analyze against the Decision Guide and full pattern catalog. Patterns that didn't apply before (e.g., fusion opportunities, materialization candidates) may now be relevant.
 - **<10% improvement** → Try another Section 3 pattern. Re-examine trace for additional bottlenecks.
 - **Results differ** → Revert. The optimization changed calculation semantics. Try a different approach.
 - **Tier 1 exhausted** → Move to Phase 3 (Tier 2) with user approval.
@@ -220,7 +220,7 @@ Before proceeding:
 - **Query syntax error** — Use `dax_query_operations` Validate before executing.
 - **Semantic equivalence failure** — Optimization changed calculation semantics. Review filter context, aggregation granularity, and CALCULATE filter arguments. Revert and try differently.
 - **No improvement found** — Some queries are already well-optimized at the DAX level. Check whether the bottleneck is data layout (Phase 4) or query structure (Phase 3).
-- **Trace events empty** — Ensure `GetExecutionMetrics=true` was set on the Execute call. The trace is automatically managed when this flag is set.
+- **Trace events empty** — Ensure `GetExecutionMetrics=true` was set on the Execute call.
 
 ---
 
@@ -327,26 +327,33 @@ When server timings are returned as `CalculatedExecutionMetrics`, use these raw 
 
 ### Analyzing Trace Events
 
-The modeling MCP trace returns raw Analysis Services events. Request these columns for diagnosis: `EventClassName`, `EventSubclassName`, `TextData`, `Duration`, `CpuTime`, `StartTime`.
+When `GetExecutionMetrics=true`, the Execute call returns trace events as an embedded JSON resource. Each event includes: `EventClassName`, `EventSubclassName`, `TextData`, `Duration`, `CpuTime`, `StartTime`, `EndTime`, `RequestId`, `Error`.
 
 **Key event types:**
 - `VertiPaqSEQueryBegin` / `VertiPaqSEQueryEnd` — SE scan lifecycle. `Duration` and `CpuTime` are on the End event. `TextData` contains the xmSQL query.
 - `VertiPaqSEQueryCacheMatch` — SE query answered from cache (no scan). Count these separately.
 - `QueryBegin` / `QueryEnd` — Overall DAX query lifecycle. `Duration` on QueryEnd = total wall-clock time.
 - `ExecutionMetrics` — Summary metrics including `storageEngineQueryCount`, `formulaEngineDuration`, etc.
+- `AggregateTableRewriteQuery` — Fired when the engine rewrites a query to use an aggregation table. `TextData` contains the rewritten query. Presence indicates the engine found and used an agg table hit — absence on an agg-enabled model means the query fell through to the detail table.
 
-**Identifying FE gaps from raw events:**
-FE processing occurs in the gaps *between* SE events. To find large FE gaps:
-1. Order all `VertiPaqSEQueryBegin` and `VertiPaqSEQueryEnd` events by `StartTime`
-2. The gap between one SE End and the next SE Begin is FE processing time
-3. The gap between `QueryBegin` and the first `VertiPaqSEQueryBegin` is FE plan compilation
-4. The gap between the last `VertiPaqSEQueryEnd` and `QueryEnd` is final FE assembly
-5. A large gap (>100ms) between SE events signals expensive FE computation — look at the SE query *before* the gap to understand what intermediate result FE is processing
+> **Filtering trace output:** Focus on the event types above. Ignore `VertiPaqScanInternal` subclass events — these duplicate the outer `VertiPaqScan` with internal detail (e.g., `DC_KIND="DENSE"`) and identical timing. Also ignore `CommandBegin`/`CommandEnd` (DAX execution wrapper, no diagnostic value) and `Error` events (only relevant when errors occur).
 
-**Storage Engine event details (VertiPaqSEQueryEnd TextData):**
-- **CallbackDataID** / **EncodeCallback**: FE callback — row-by-row evaluation forced into SE
-- **`[Estimated size (volume, marshalling bytes): X, Y]`** appended at end of TextData — X is rows scanned, Y is marshalling bytes
-- **Per-scan parallelism**: `CpuTime / Duration` for that individual scan. Low ratio means single-threaded despite healthy aggregate parallelism
+**Per-scan derived metrics (from VertiPaqSEQueryEnd events):**
+
+Each `VertiPaqSEQueryEnd` event provides the raw data to derive per-scan diagnostics:
+
+- **Rows scanned / Marshalling KB** — parse `[Estimated size (volume, marshalling bytes): X, Y]` at the end of `TextData`. X = rows, Y = bytes. Identifies excessive materializations on a specific scan.
+- **Per-scan parallelism** — `CpuTime / Duration` for that individual scan. A ratio near 1.0 means single-threaded even if the aggregate `storageEngineCpuFactor` looks healthy.
+- **Callbacks on slow scans** — scan `TextData` for `CallbackDataID`/`EncodeCallback` to confirm which specific SE query has the callback.
+
+**Building an FE gap waterfall:**
+
+FE processing occurs in the gaps *between* SE events. Use `StartTime`/`EndTime` offsets from `QueryBegin.StartTime` to build a timeline:
+1. Gap between `QueryBegin` and the first SE `StartTime` → FE plan compilation
+2. Gap between one SE `EndTime` and the next SE `StartTime` → FE processing block
+3. Gap between the last SE `EndTime` and `QueryEnd.EndTime` → final FE assembly
+4. Overlapping SE events → parallel SE execution; sequential non-overlapping → FE feeding results between scans
+5. A large gap (>100ms) signals expensive FE computation — examine the SE query *before* the gap
 
 ### What to Look For
 
@@ -359,7 +366,8 @@ Scan for these signals in priority order when analyzing a slow query:
 5. **Low parallelism factor** — near 1.0 on slow scans → data layout problem, not DAX. See Compression, Segments, and Parallelism.
 6. **High KB per SE event** — wide intermediate tables; reduce columns or aggregate earlier.
 7. **Two-step dimension pre-scans** — dimension-only SELECT followed by `where predicate` on the fact. Restructure query to collapse into one scan.
-8. **Large semi-join index tables** — `DEFINE TABLE` + `ININDEX` where the index contains thousands of rows.
+8. **Large semi-join index tables** — `DEFINE TABLE` + `ININDEX` or `WHERE ... IN` with hundreds of compound tuples (e.g., `(GroupByCol, FilterKey)` pairs). See DAX021.
+9. **Missing aggregate table hit** — Model has agg tables configured but no `AggregateTableRewriteQuery` event in the trace → query fell through to the detail table. Check agg table mappings and query grain.
 
 **Prioritization:** Callbacks → Large FE processing → SE query count (DAX) → parallelism and data volume (data layout). Target the highest-duration SE scan first — ignore 0ms cache-hit scans.
 
@@ -381,7 +389,7 @@ The DAX is clean but SE scans are slow due to insufficient segments or poor comp
 
 > **Autonomy: Auto-apply freely. Modify only measure/UDF definitions in the DEFINE block. Keep EVALUATE and SUMMARIZECOLUMNS grouping identical.**
 
-> **SUMMARIZECOLUMNS in measures:** `SUMMARIZECOLUMNS` is now fully supported inside measure definitions. Earlier restrictions that required `ADDCOLUMNS(VALUES(...), ...)` no longer apply.
+> **Prefer SUMMARIZECOLUMNS:** Fully supported inside measure definitions — earlier restrictions no longer apply. Use it to replace `ADDCOLUMNS`/`SUMMARIZE` patterns (DAX002), pre-materialize context transitions before iterating (DAX006), and cache repeated evaluations into a single virtual table (DAX003). Prefer it over `ADDCOLUMNS(VALUES(...), ...)` unless a specific scenario prevents it.
 
 ### DAX001: Use Simple Column Filter Predicates as CALCULATE Arguments
 
@@ -841,6 +849,47 @@ MEASURE 'Sales'[Combined YTD] = CALCULATE ( [Bikes] + [Accessories], DATESYTD('D
 ```
 
 Same principle applies to runtime variable filters — move them to the consuming measure. See DAX017 when the filtered column is not in the groupby.
+
+---
+
+### DAX021: Pre-Compute and Join Instead of Filter Round-Trip
+
+When a measure computes a qualifying key set from a filtered aggregation and then uses TREATAS or IN to filter a second aggregation by those keys, the outer SUMMARIZECOLUMNS context compounds the key filter with groupby columns — generating large tuple semi-joins (e.g., 500+ `(Brand, Key)` pairs in a single WHERE clause). The compound-tuple SE scan often dominates total query time.
+
+**SE signal:** `VertiPaqSEQueryEnd` with `DEFINE TABLE ... ININDEX` or `WHERE ... IN` containing hundreds of compound tuples. Single scan duration disproportionately high relative to others.
+
+**Fix:** Pre-compute both aggregations independently at the shared key grain, then join with NATURALINNERJOIN in the FE. The table expression used to build each side — `ADDCOLUMNS(VALUES(...), ...)`, `SUMMARIZECOLUMNS(...)`, etc. — does not matter; the key is that both sides share a common lineage column for the join.
+
+**Anti-pattern — TREATAS pushes key set back to SE, compounded by outer groupby:**
+```dax
+VAR _FilteredAgg =
+    CALCULATETABLE (
+        ADDCOLUMNS ( VALUES ( 'Fact'[Key] ), "@Agg1", [Measure] ),
+        'Dim'[Filter] = "X"
+    )
+VAR _Qualifying = FILTER ( _FilteredAgg, [@Agg1] > 1000000 )
+VAR _Result =
+    CALCULATE (
+        [Measure],
+        TREATAS ( SELECTCOLUMNS ( _Qualifying, "K", 'Fact'[Key] ), 'Fact'[Key] )
+    )
+```
+
+**Preferred — both aggregations pre-computed, joined in FE:**
+```dax
+VAR _FilteredAgg =
+    CALCULATETABLE (
+        ADDCOLUMNS ( VALUES ( 'Fact'[Key] ), "@Agg1", [Measure] ),
+        'Dim'[Filter] = "X"
+    )
+VAR _Qualifying = FILTER ( _FilteredAgg, [@Agg1] > 1000000 )
+VAR _UnfilteredAgg =
+    ADDCOLUMNS ( VALUES ( 'Fact'[Key] ), "@Agg2", [Measure] )
+VAR _Joined = NATURALINNERJOIN ( _Qualifying, _UnfilteredAgg )
+VAR _Result = SUMX ( _Joined, [@Agg2] )
+```
+
+> **Why it works:** Each pre-computed table generates independent SE scans — clean, no tuple filters. NATURALINNERJOIN matches on the shared `'Fact'[Key]` lineage column in the FE, replacing the expensive compound-tuple SE round-trip with a fast in-memory join over small pre-materialized tables.
 
 ---
 

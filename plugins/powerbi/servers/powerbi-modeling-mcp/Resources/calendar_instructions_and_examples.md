@@ -9,22 +9,21 @@ This guide explains how to define calendar column groups in a Power BI date tabl
 
 ## Concepts
 
-- Calendar Column Groups. Use these when a primary column cleanly represents a standard time unit such as Year, Quarter, Month, Week, or Date. Time units (including "of year" variants) are defined by a fixed enumeration; use the exact casing shown below.
+- Calendar Column Groups. Use these when a primary column represents a standard time unit such as Year, Quarter, Month, Week, or Date. Time units (including "of year" variants) are defined by a fixed enumeration; use the exact casing from the **Allowed time units** list.
 - Time-related groups. Use these for relative columns that are time-aware but are not a standard time unit (for example, RelativeMonth with values like "Current"/"Previous"). They can be used to slice/label time-aware analyses but do not themselves define a standard unit.
 - Primary vs. associated columns. When a column maps to a specific unit, make it the primaryColumn for that unit. If column A is sorted by column B (Power BI SortByColumn), then B should be the primaryColumn and A should be an associatedColumn. Optionally add other 1-to-1 associatedColumns for alternate labels (e.g., a long and a short month name).
 
 ## Mapping guidance
 
-- Prefer a time unit group when the mapping is unambiguous; use the exact unit name from the list below.
-- Use a time-related group for relative states (e.g., current/previous/next) that don't represent a standard unit. Time-related groups have unknown time units.
-- For textual labels that are sorted by another column, use the sort column as the primary and add the text label as an associatedColumn.
-- Add associatedColumns only for strict 1-to-1 label relationships.
-- Each calendar definition should use columns from only its host table.
-- Build hierarchies that roll up cleanly (Year → Quarter → Month → Date).
+- Calendar names must be unique across the entire model, not just within a single table. Even though a calendar belongs to a specific table, no two calendars in the model can share the same name.
+- Each calendar definition must use columns from only its host table.
+- Build hierarchies where each level subdivides exactly into the level above: Year → Quarter → Month → Date.
+- For week-based (4-4-5, 4-5-4, 5-4-4, or ISO) calendars, the hierarchy is typically Year → Quarter → Period → Week → Date. Map the Period level to the `Month` time unit, because Period occupies the same hierarchical position between Week/Quarter and Year that Month does in a Gregorian calendar.
+- When using ISO week numbers, always pair them with the corresponding ISO Year — not the Gregorian year. A date in early January may belong to the previous ISO year, and a date in late December may belong to the next ISO year. Mixing ISO weeks with Gregorian years produces incorrect results.
 - Do not repeat a time unit within the same calendar.
-- Columns tagged in a calendar must be tagged to the same time unit (or as a time-related column) across all calendars.
+- **Only one time-related group per calendar.** All time-related columns (relative offsets, flags like IsWeekend, FutureDate, etc.) must be combined into a **single** TimeRelated column group. The engine keys column groups by time unit; since all time-related columns share the implicit `Unknown` key, creating multiple separate TimeRelated groups will fail with: *"The CalendarColumnGroup with the key of 'TimeRelated' already exists."* Pass all such columns in one group's column list.
+- A column must map to the same time unit (or as time-related) in every calendar that includes it.
 - Do not use the same physical column more than once in the same calendar.
-- Associated columns are optional but must be 1-to-1 with the primary.
 - Complete vs. Partial units:
   - Complete units uniquely identify a single period and must include the calendar context (e.g., include the year): Year, Quarter, Month, Week, Date.
     - Examples: 2024 (Year), Q3 2024 (Quarter), 2024-01 or "January 2024" (Month), 2024-W49 (Week), 2024-01-15 (Date).
@@ -43,11 +42,18 @@ This guide explains how to define calendar column groups in a Power BI date tabl
 
 ## Allowed time units
 
+Time unit values are **case-sensitive enum names**, not natural-language words. Common mistakes:
+- Do **not** pluralize: use `Year`, not `Years`; `Quarter`, not `Quarters`; `Month`, not `Months`.
+- The daily unit is `Date`, not `Day` or `Days`.
+- Compound units use exact PascalCase: `MonthOfYear`, not `MonthOfYear` variants like `monthofyear` or `Month_Of_Year`.
+
+The API validates the first column group and rejects the entire request on the first invalid value.
+
 ```yaml
 timeUnits:
   - id: Unknown
     example: "IsWeekend"
-    note: "Used for both season-type and period-type time-related columns. Future enhancements may provide separate categories."
+    note: "Used for all time-related columns (season-type, period-type, flags, etc.)."
   - id: Year
     example: 2022
   - id: Quarter
@@ -180,3 +186,64 @@ Tables:
           - column: RelativeMonth
           - column: Season
 ```
+
+**API note:** The `timeRelatedGroups` entries above represent individual columns within **one** group, not separate groups. When calling the calendar API, combine them into a single TimeRelated column group: `{"groupType": "TimeRelated", "timeRelatedGroup": {"columns": ["RelativeMonth", "Season"]}}`.
+
+## Week-based (4-4-5 / ISO) calendar example
+
+In a week-based calendar, weeks are a proper hierarchical level. Periods replace months and contain a whole number of weeks (e.g., 4, 4, and 5 weeks per quarter in a 4-4-5 pattern). As noted in Mapping guidance, map Period to the `Month` time unit and use the ISO year — not the Gregorian year — as the year column.
+
+```yaml
+Tables:
+  - Name: ISO Date
+    Columns:
+      - Name: Date
+        Type: Date
+      - Name: ISO Year
+        Type: Integer
+      - Name: Year-Period
+        Type: Integer
+        # e.g., 202403 = period 3 of ISO year 2024
+      - Name: Year-Week
+        Type: Integer
+        # e.g., 202449 = week 49 of ISO year 2024
+      - Name: Period
+        Type: Integer
+        # Period number within the year (1-12)
+      - Name: ISO Week
+        Type: Integer
+        # ISO week number (1-53)
+      - Name: Week in Period
+        Type: Integer
+        # Week position within its period (1-4 or 1-5)
+      - Name: Day of Week
+        Type: Integer
+        # 1=Monday through 7=Sunday
+    Calendars:
+      - name: ISOCalendar445
+        calendarColumnGroups:
+          - timeUnit: Year
+            primaryColumn: ISO Year
+          - timeUnit: Month
+            # Period maps to Month because it occupies the same
+            # hierarchical position between Week and Year
+            primaryColumn: Year-Period
+          - timeUnit: MonthOfYear
+            primaryColumn: Period
+          - timeUnit: Week
+            primaryColumn: Year-Week
+          - timeUnit: WeekOfYear
+            primaryColumn: ISO Week
+          - timeUnit: Date
+            primaryColumn: Date
+        timeRelatedGroups:
+          - column: Week in Period
+          - column: Day of Week
+```
+
+**Notes on week-based calendars and time intelligence:**
+- With a custom calendar defined this way, standard DAX time intelligence functions (DATESYTD, DATESMTD, DATESWTD, SAMEPERIODLASTYEAR, DATEADD) automatically adapt to the week-based hierarchy.
+- DATESMTD returns period-to-date results (since Period is mapped to Month).
+- DATESWTD returns week-to-date results.
+- SAMEPERIODLASTYEAR shifts to the same week number and day-of-week in the previous ISO year, which ensures that comparisons always cover the same number of days.
+- DATEADD supports Extension (Precise or Extending) and Truncation (Anchored or Blanks) parameters to handle shifts between periods of different lengths (e.g., 4-week vs. 5-week periods).
