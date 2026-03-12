@@ -9,8 +9,7 @@
             "args": [
                 "--start"
             ],
-            "env": {
-                "PBI_MODELING_MCP_CLIENT_ID": "ea0616ba-638b-4df5-95b9-636659ae5121"
+            "env": {                
             }
         }
     }
