@@ -120,7 +120,9 @@ Once installed, plugins activate automatically. Skills fire when relevant — fo
 ### Spec driven development
 
 - Create a Fabric workspace
+- Using the [powerbi-architect](plugins/powerbi/agents/powerbi-architect.agent.md) agent
 - Run the prompt below
+- Using the [powerbi-developer](plugins/powerbi/agents/powerbi-developer.agent.md) agent ask to implement the spec created by the architect agent
 
 Prompt:
 ```
@@ -146,6 +148,10 @@ Prompt:
 - When analysing CSV files from GitHub don't use the fetch_webpage. Download the files locally to a temp folder (`temp/`) and analyze the top ~50 rows without loading the entire file to LLM context window.
     
 ```
+
+## Acknowledgments
+
+The `fabric` plugin includes the `fabric-cli` skill by [Kurt Buhler](https://github.com/data-goblin), originally from [fabric-cli-plugin](https://github.com/data-goblin/fabric-cli-plugin).
 
 ## No Warranty / Limitation of Liability
 

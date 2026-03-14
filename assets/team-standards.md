@@ -10,7 +10,6 @@ Quality assessment for Power BI semantic models using prioritized structured rul
 - Explicit measures enforced for all aggregatable numeric columns, and base column should be hidden
 - Measure should include a `formatString` definition
 - Columns should include appropriate summarizeBy settings (e.g. Quantity > Sum; Stock Qty > Max), hidden foreign keys, no accidental aggregation
-- Repeated DAX patterns should be centralized using DAX UDF functions.
   
 ### Important
 

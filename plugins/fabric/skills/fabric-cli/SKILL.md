@@ -4,8 +4,6 @@ description: Use Microsoft Fabric CLI (fab) to manage workspaces, semantic model
 
 ---
 
-Note: This skill was copied from https://github.com/data-goblin/fabric-cli-plugin/
-
 # Microsoft Fabric CLI Operations
 
 > **Note:** If you have access to a Bash tool (e.g., Claude Code), execute `fab` commands directly via Bash rather than using an MCP server.
