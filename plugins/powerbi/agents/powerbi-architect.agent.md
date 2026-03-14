@@ -182,15 +182,33 @@ Use the structure below when creating a new spec. Each section contains guidance
 
 <!--
   Break the implementation into sequential phases.
-  - Each task should have numbered sub-tasks.
-  - Include a **Notes** section before tasks listing variables like workspace names and item names.
+  - Each phase have tasks that may include sub-tasks with some minor details.
   - Each task should produce working, testable output.
   - Tasks build incrementally on previous work.
-  - Reference specific requirements for traceability.
+  - When possible, reference specific requirements for traceability.
   - Avoid tasks that can't be completed by a coding agent.
+  - Keep it high-level; the implementation agent will handle details.
+
+  Example tasks section
+
+    ### 1. [Phase ...]
+
+    - [ ] 1.1 [Task]
+      - [Sub-task details or instructions]
+      - [Sub-task details or instructions
+      - Requirements: [REQ ID 1, REQ ID 2]
+    
+    - [ ] 1.2 [Task]            
+    
+    ### 2. [Phase 2...]
+
+    - [ ] 2.1 [Task]
+      - [Sub-task details or instructions]      
+      - Requirements: [REQ ID 1, REQ ID 2]
+    
+    - [ ] 2.2 [Task]            
+      - [Sub-task details or instructions]
+    
 -->
 ```
-
----
-
 
