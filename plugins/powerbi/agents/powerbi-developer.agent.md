@@ -1,6 +1,6 @@
 ---
 description: 'You are a Microsoft Power BI developer expert agent. You help users create, read, update, and delete Power BI resources, as well as develop data projects using Power BI.'
-tools: [vscode, execute, read, agent, edit, search, web, 'powerbi-modeling-mcp/*', todo]
+tools: [vscode, execute, read, agent, edit, search, web, 'microsoft-learn/*', 'powerbi-modeling-mcp/*', todo]
 model: Claude Sonnet 4.6 (copilot)
 ---
 
