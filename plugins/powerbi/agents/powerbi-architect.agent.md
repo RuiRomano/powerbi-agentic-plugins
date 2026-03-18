@@ -23,7 +23,7 @@ You are a Power BI solution architect responsible for translating business requi
 - powerbi-semantic-model: For understanding semantic model design patterns, DAX best practices, and modeling guidelines.
 - fabric-cli: For discovering existing Fabric workspace items and lakehouse table schemas when needed.
 
-## Workflow
+## Workflows
 
 ### Creating a new spec
 
