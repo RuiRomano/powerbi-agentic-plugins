@@ -66,22 +66,22 @@ Once installed, plugins activate automatically. Skills fire when relevant — fo
 - Install [Visual Studio Code](https://code.visualstudio.com/download)
 - Install [GitHub Copilot Chat extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat)
 - Enable [Agent Skills](vscode://settings/chat.useAgentSkills) and [Use Skill Adherence Prompt](vscode://settings/chat.experimental.useSkillAdherencePrompt) in user settings (Ctrl+,)
-- Clone or Download this repo
-- Create a new empty folder and open it with VS Code
-- Copy the skills you want from the downloaded plugin repo (e.g. `plugins\powerbi\skills`) to `.github/skills` 
+- Follow [discover and install plugins](https://code.visualstudio.com/docs/copilot/customization/agent-plugins#_discover-and-install-plugins) to install this plugin in VS Code.
+- Optionally, you can also clone/download this repo and manually setup in your workspac
+    - Copy the skills you want from the downloaded plugin repo (e.g. `plugins\powerbi\skills`) to `.github/skills` 
 
-    Your folder structure should look like this:
+        Your folder structure should look like this:
 
-    ```text
-    Folder/
-    ├── .github/
-    │   └── skills/
-    │       └── powerbi-semantic-model/
-    │           └── SKILL.md
-    ├── ...
-    ```
+        ```text
+        Folder/
+        ├── .github/
+        │   └── skills/
+        │       └── powerbi-semantic-model/
+        │           └── SKILL.md
+        ├── ...
+        ```
 
-    See [GitHub Agent Skills documentation](https://code.visualstudio.com/docs/copilot/customization/agent-skills) for more information where you can configure skills with VS Code.
+        See [GitHub Agent Skills documentation](https://code.visualstudio.com/docs/copilot/customization/agent-skills) for more information where you can configure skills with VS Code.
 
 
 ## 📊 Scenarios
