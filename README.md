@@ -2,12 +2,6 @@
 
 Plugins that turn GitHub Copilot into a specialist for Power BI and Microsoft Fabric development. Built for [GitHub Copilot CLI](https://github.com/features/copilot/cli) and [Claude Code](https://claude.com/product/claude-code), also compatible with [VS Code](https://code.visualstudio.com/).
 
-## 💡 Why Plugins
-
-GitHub Copilot helps you write code. Plugins let you go further: teach Copilot how Power BI semantic models should be structured, which Fabric CLI commands to use, how to author reports in PBIR format, and what best practices to follow - so you get accurate, domain-specific help instead of generic suggestions.
-
-Each plugin bundles the skills, tools, and agents for a specific area of the Microsoft data platform. Out of the box, they give Copilot a strong starting point for Power BI and Fabric work. The real power comes when you customize them for your organization - your naming conventions, your workspace structure, your modeling patterns.
-
 ## 📦 Plugins
 
 | Plugin                           | What it does                                                                                                                      | 
@@ -26,7 +20,7 @@ plugin-name/
 ```
 
 - **Skills** encode domain expertise, best practices, command references, and step-by-step workflows. Copilot draws on them automatically when relevant.
-- **Agents** define personas with specific responsibilities (e.g., a Power BI creator vs. consumer) and declare which skills and tools to use.
+- **Agents** define personas with specific responsibilities (e.g., a Power BI architect vs. developer) and declare which skills and tools to use.
 - **Connectors** wire Copilot to external tools — the Fabric CLI and Power BI Modeling MCP — via [MCP servers](https://modelcontextprotocol.io/).
 
 **These plugins are starting points.** They become much more useful when you customize them for how your team actually works:
@@ -34,7 +28,6 @@ plugin-name/
 - **Add company context** — Add your naming conventions, workspace structure, and modeling patterns into skill files so Copilot understands your world.
 - **Adjust workflows** — Modify skill instructions to match how your team does things (e.g., your deployment pipeline, your BPA rules).
 - **Swap connectors** — Edit `.mcp.json` to point at your specific MCP servers.
-- **Build new plugins** — Follow the structure above to create plugins for additional scenarios.
   
 ## 🚀 Getting Started
 
