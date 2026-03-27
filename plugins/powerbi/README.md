@@ -27,11 +27,11 @@ Activated when a user needs to design a Power BI solution before implementation.
 
 ## Skills
 
-### `powerbi-semantic-model`
+### `powerbi-semantic-model-authoring`
 
 Activated for any semantic model operation — creating or editing tables, measures, relationships, and hierarchies; writing DAX; configuring Direct Lake partitions; deploying models to Fabric; and working with TMDL files and PBIP projects.
 
-### `powerbi-report`
+### `powerbi-report-authoring`
 
 Activated for any report operation — creating or editing Power BI reports in PBIR format, configuring visuals and pages, applying themes, rebinding reports to different semantic models, and deploying reports to Fabric workspaces.
 
