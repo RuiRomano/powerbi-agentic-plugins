@@ -1,6 +1,6 @@
 ---
-name: powerbi-semantic-model
-description: Guide to develop Power BI Semantic Models. Use this skill when asked to connect to a semantic model for analysis or any development operation against a Power BI Semantic Model including (1) Creating new models or Direct Lake models, (2) Creating/editing measures using DAX, (3) Creating/editing tables and relationships, (4) Analyzing model best practices, (5) Deploying models to Fabric workspace, (6) Working with PBIP projects containing semantic models, (7) Troubleshooting DAX performance, (8) Refreshing semantic models in Desktop or Fabric service, (9) Create or edit TMDL code or TMDL files. Do NOT use for report layout/visual authoring (use powerbi-pbir), or workspace/pipeline administration (use fabric-cli).
+name: powerbi-semantic-model-authoring
+description: Develops and manages Power BI Semantic Models. Handles connecting to semantic models for analysis and all development operations including (1) Creating new models, (2) Creating/editing measures using DAX, (3) Creating/editing tables and relationships, (4) Analyzing model best practices, (5) Deploying models to Fabric workspace, (6) Working with PBIP projects containing semantic models, (7) Troubleshooting DAX performance, (8) Refreshing semantic models in Desktop or Fabric service, (9) Creating or editing TMDL code or TMDL files. Does NOT handle report layout/visual authoring, or workspace/pipeline administration (use fabric-cli).
 ---
 
 # Power BI Semantic Model Skill
@@ -58,9 +58,9 @@ When working with TMDL code directly, follow these guidelines:
 
 A semantic model can be loaded from the following locations:
 
-1. **Power BI Desktop**: Use the MCP server tools to find the Power BI Desktop local instance and connect to it.
-2. **Fabric workspace**: Use the MCP server tools to connect to the semantic model in the workspace, make sure to use the exact workspace and semantic model name. Or use the Fabric CLI (`fab`) to export the semantic model code.
-3. **Power BI Project files (PBIP)**: Use the MCP server tools to connect to the PBIP folder.
+1. **Power BI Desktop**: Use `powerbi-modeling-mcp` tools to find the Power BI Desktop local instance and connect to it.
+2. **Fabric workspace**: Use `powerbi-modeling-mcp` tools to connect to the semantic model in the workspace, make sure to use the exact workspace and semantic model name. Or use the Fabric CLI (`fab`) to export the semantic model code.
+3. **Power BI Project files (PBIP)**: Use `powerbi-modeling-mcp` tools to connect to the PBIP folder.
 
 ## Task: Create a new semantic model
 
@@ -68,12 +68,12 @@ A semantic model can be loaded from the following locations:
 2. **Determine model storage mode** — If the data source is Fabric OneLake > Direct Lake (see [Task: Create a new Direct Lake model](#task-create-a-new-direct-lake-model)). Otherwise > Import mode.
 3. **Create the database** — Create a new empty semantic model database with compatibility level 1702 or higher.
 4. **Create data source parameters** — (Skip for Direct Lake) Create semantic model M parameters for the data sources (`Server`, `Database`, etc.), and use them in the partition M code. This makes it easier to rebind the model and helps with deployments.
-5. **Analyze source schema** — Use MCP tools or Fabric CLI to inspect the source tables, columns, and data types.
+5. **Analyze source schema** — Use `powerbi-modeling-mcp` tools or Fabric CLI to inspect the source tables, columns, and data types.
 6. **Design star schema** — Identify fact and dimension tables, define relationship keys. Follow [modeling-guidelines](references/modeling-guidelines.md).
 7. **Create tables** — Add partitions with correct source type, create columns with proper data types and `sourceColumn` mapping.
 8. **Create relationships** — Define relationships between fact and dimension tables before creating measures.
 9. **Create measures** — Add explicit measures for aggregatable columns. Follow DAX guidelines in [modeling-guidelines](references/modeling-guidelines.md).
-11. **Save/Deploy** — Export to PBIP project or deploy to workspace.
+10. **Save/Deploy** — Export to PBIP project or deploy to workspace.
 
 ## Task: Create a new Direct Lake model
 
@@ -109,6 +109,8 @@ After any model modification, always verify your work:
 4. **Verify table columns** — For new tables, confirm all columns have correct `sourceColumn` mapping and `dataType`.
 5. **Check for duplicates** — Ensure no duplicate measures (same DAX expression) or orphan objects were introduced.
 
+If any check fails, fix the issue and re-run validation from step 1. Only proceed to Save when all checks pass.
+
 ## Task: Run Best Practice Analysis (BPA) rules
 
 Run the script `scripts/bpa.ps1` against the semantic model. If no specific BPA rules are mentioned, use the default set of rules in `scripts/bpa-rules-semanticmodel.json`. The script runs the BPA rules using Tabular Editor 2.0.
@@ -133,41 +135,22 @@ Report findings with severity levels (Critical, High, Medium, Info).
 
 ## Task: Deploy a semantic model code to Fabric Workspace
 
-### Option 1: MCP Server (preferred)
 1. Ensure the model is loaded in MCP.
-2. Use `database_operations` with `Deploy` operation.
+2. Use `powerbi-modeling-mcp:database_operations` with `Deploy` operation.
 3. Specify the target workspace and semantic model name.
 4. Verify the deployment succeeded by listing the workspace items.
 
-### Option 2: Fabric CLI
-1. Ensure the model is saved in PBIP format (see [pbip.md](references/pbip.md)).
-2. Use the `fabric-cli` skill to deploy the semantic model item to the target workspace.
-3. Verify the item appears in the workspace.
+If `powerbi-modeling-mcp` is unavailable, ensure the model is saved in PBIP format (see [pbip.md](references/pbip.md)) and use the `fabric-cli` skill to deploy.
 
 ## Task: Refresh a Semantic Model
 
 Refresh is only possible when working against a live model in Power BI Desktop or Fabric Service. If working with local TMDL files, instruct the user to deploy the model to a workspace or open it in Power BI Desktop to enable refresh capabilities.
 
-### Refresh in Power BI Desktop
+Determine the refresh target:
 
-Use the Refresh tools available to you in the MCP server to refresh individual tables or the entire model.
-
-### Refresh in Fabric Service (Workspace)
-
-Two options are available:
-
-**Option 1: MCP Server (preferred)**
-Connect to the semantic model in the workspace and use the Refresh tools available to you in the MCP server.
-
-**Option 2: Power BI REST API**
-
-Use the Power BI Refresh API:
-
-```
-POST https://api.powerbi.com/v1.0/myorg/groups/{groupId}/datasets/{datasetId}/refreshes
-```
-
-Poll `GET /groups/{groupId}/datasets/{datasetId}/refreshes` to check refresh status.
+- **Power BI Desktop** -> Use `powerbi-modeling-mcp` Refresh tools to refresh individual tables or the entire model.
+- **Fabric Service + MCP available** -> Connect to the semantic model in the workspace and use `powerbi-modeling-mcp` Refresh tools.
+- **Fabric Service + no MCP** -> Use the Power BI Enhanced Refresh API (`POST /groups/{groupId}/datasets/{datasetId}/refreshes`) and poll the refresh status endpoint to check completion.
 
 ### Credential Configuration Errors (Service only)
 

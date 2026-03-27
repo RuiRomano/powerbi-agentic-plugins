@@ -1,5 +1,5 @@
 ---
-name: powerbi-report
+name: powerbi-report-authoring
 description: Guide to develop Power BI Reports in PBIR format. Use this skill for any development operation against a Power BI Report PBIR file format including (1) Creating new reports on top of semantic models, (2) Editing visuals, pages, and bookmarks, (3) Aligning and laying out visuals, (4) Rebinding reports to different semantic models, (5) Deploying reports to Fabric workspaces, (6) Exporting reports from workspaces. Do NOT use for semantic model development or TMDL (use powerbi-semantic-model), or workspace/pipeline administration (use fabric-cli).
 ---
 
@@ -14,7 +14,7 @@ This skill provides guidance on how to develop Power BI reports using the PBIR (
 
 ## Relationship to Other Skills
 
-- **powerbi-semantic-model**: Use for semantic model development (tables, measures, DAX). This skill (`powerbi-report`) handles report layout, visuals, and pages only.
+- **powerbi-semantic-model**: Use for semantic model development (tables, measures, DAX). This skill handles report layout, visuals, and pages only.
 - **fabric-cli**: Use for workspace operations, deploying, and exporting report definitions.
 
 ## Pre-development: Understand the Report
