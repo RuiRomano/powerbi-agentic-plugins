@@ -12,7 +12,7 @@
             "name": "powerbi",
             "description": "Skills and tools for agentic Power BI development including Semantic Modeling, TMDL, PBIR, Best Practices.",
             "source": "./plugins/powerbi",
-            "version": "0.2.0",
+            "version": "0.2.1",
             "keywords": [
                 "power-bi",
                 "tmdl",

@@ -180,11 +180,13 @@ Load [dax-performance-optimization](references/dax-performance-optimization.md) 
 
 When asked to open/load the semantic model from a PBIP, you must only load the `[Name].SemanticModel/definition` folder that includes the TMDL code of the semantic model.
 
-## Task: Save to PBIP
+## Task: Save or Export to PBIP
 
 **CRITICAL:** Make sure you understand the PBIP structure in [pbip.md](references/pbip.md).
 
-When asked to save the semantic model to a new PBIP folder make sure you create the folder and files from the structure above using the provided examples and serialize the model database to the `[Name].SemanticModel/definition` folder.
+- Create a PBIP structure if it doesn't exist, following the guidelines in [pbip.md](references/pbip.md).
+- Serialize the database definition to the `[Name].SemanticModel/definition` folder in TMDL format. 
+- If there is no report, create a empty report folder with a minimal `definition.pbir` file that references the semantic model using `byPath` to ensure the PBIP is valid and can be opened in Power BI Desktop.
 
 ## Error Handling
 

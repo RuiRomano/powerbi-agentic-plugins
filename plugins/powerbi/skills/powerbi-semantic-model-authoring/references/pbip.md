@@ -11,11 +11,11 @@ PBIPFolder/
 ├── [Name].SemanticModel/
 |   ├── /definition # The semantic model definition using TMDL language [REQUIRED]
 |   ├── definition.pbism # The semantic model definition file [REQUIRED]
-|   ├── * # Other semantic model metadata files and folders
+|   ├── .platform
 ├── [Name].Report/        
 |   ├── /definition # The report definition using PBIR format
 |   ├── definition.pbir # The report definition file with a byPath relative reference to the semantic model folder folder. [REQUIRED]
-|   ├── * # Other report metadata files and folders
+|   ├── .platform
 └── [Name].pbip # A shortcut file to the report folder
 ```    
 
@@ -110,6 +110,21 @@ Example of a `[name].pbip` file:
 
 Refer to [JSON Schema](https://github.com/microsoft/json-schemas/blob/main/fabric/pbip/pbipProperties/1.0.0/schema.json) for more details.
 
+## .platform file
+
+```json
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel|Report",
+    "displayName": "[Display Name]"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "[GUID]"
+  }
+}
+```
 
 ## References
 
