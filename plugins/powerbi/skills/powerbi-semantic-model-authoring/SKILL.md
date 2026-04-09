@@ -21,7 +21,7 @@ This skill provides guidance on how to develop Power BI semantic models.
 
 - Respect the [Tool Selection Priority](#tool-selection-priority).
 - If asked to work with TMDL code or *.tmdl files, load the [TMDL reference](references/TMDL.md) to understand the syntax and properties of TMDL objects.
-- If asked to export or save the semantic model to a PBIP project, make sure you understand the PBIP explained in [PBIP reference](references/pbip.md).
+- If asked to export or save the semantic model to a PBIP project, make sure you understand the PBIP explained in [references/pbip.md](references/pbip.md).
 
 ## Tool Selection Priority
 
@@ -176,15 +176,14 @@ Load [dax-performance-optimization](references/dax-performance-optimization.md) 
 
 ## Task: Open Semantic Model from PBIP
 
-**CRITICAL:** Make sure you understand the PBIP structure in [pbip.md](references/pbip.md).
-
-When asked to open/load the semantic model from a PBIP, you must only load the `[Name].SemanticModel/definition` folder that includes the TMDL code of the semantic model.
+- Make sure you understand the PBIP structure in [pbip.md](references/pbip.md).
+- Only load the `[Name].SemanticModel/definition` folder that includes the TMDL code of the semantic model.
 
 ## Task: Save or Export to PBIP
 
-- Create a PBIP structure if it doesn't exist, following the guidelines in [pbip.md](references/pbip.md).
-- Serialize the database definition to the `[Name].SemanticModel/definition` folder in TMDL format. 
-- If there is no report, create a empty report folder with a minimal `definition.pbir` file that references the semantic model using `byPath` to ensure the PBIP is valid and can be opened in Power BI Desktop.
+- Create a PBIP structure if it doesn't exist, following the guidelines in [pbip.md](references/pbip.md)
+- Serialize the database definition to the `[Name].SemanticModel/definition` folder in TMDL format
+- If there is no report folder, create a empty report folder with a minimal `definition.pbir` file that references the semantic model using `byPath` to the semantic model
 
 ## Error Handling
 
