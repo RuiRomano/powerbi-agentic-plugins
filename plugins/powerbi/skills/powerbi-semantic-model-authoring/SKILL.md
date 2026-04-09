@@ -182,8 +182,6 @@ When asked to open/load the semantic model from a PBIP, you must only load the `
 
 ## Task: Save or Export to PBIP
 
-**CRITICAL:** Make sure you understand the PBIP structure in [pbip.md](references/pbip.md).
-
 - Create a PBIP structure if it doesn't exist, following the guidelines in [pbip.md](references/pbip.md).
 - Serialize the database definition to the `[Name].SemanticModel/definition` folder in TMDL format. 
 - If there is no report, create a empty report folder with a minimal `definition.pbir` file that references the semantic model using `byPath` to ensure the PBIP is valid and can be opened in Power BI Desktop.
