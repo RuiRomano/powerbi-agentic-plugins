@@ -26,13 +26,15 @@ PBIPFolder/
 ├── [Name].Report/        
 |   ├── /definition # The report definition using PBIR format
 |   ├──  definition.pbir # The report definition file with a byConnection reference to a semantic model in a Workspace. [REQUIRED]
-|   ├── * # Other report metadata files and folders
+|   ├── .platform
 └── [Name].pbip # A shortcut file to the report folder
 ```   
 
 ## definition.pbism file
 
-No modifications are needed—just create the file exactly as shown in the example.
+Contains core settings about the semantic model and file format version.
+
+Example of `definition.pbism` file:
 
 ```json
 {
@@ -43,6 +45,7 @@ No modifications are needed—just create the file exactly as shown in the examp
     }
 }
 ```
+
 Refer to [JSON Schema](https://github.com/microsoft/json-schemas/blob/main/fabric/item/semanticModel/definitionProperties/1.0.0/schema.json) for more details.
 
 ## definition.pbir
@@ -89,7 +92,7 @@ Refer to [JSON Schema](https://github.com/microsoft/json-schemas/blob/main/fabri
 
 Serves as a shortcut to a Power BI Report. 
 
-Example of a `[name].pbip` file:
+Example of a `*.pbip` file:
 
 ```json
 {
