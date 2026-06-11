@@ -1,3 +1,7 @@
+⚠️ **Deprecation Notice**
+
+This repository is no longer actively maintained. Please refer to `powerbi-authoring` plugin and skills in [skills-for-fabric](https://github.com/microsoft/skills-for-fabric)
+
 # 🧩 Power BI Agentic Plugins
 
 Plugins that turn GitHub Copilot into a specialist for Power BI and Microsoft Fabric development. Built for [GitHub Copilot CLI](https://github.com/features/copilot/cli) and [Claude Code](https://claude.com/product/claude-code), also compatible with [VS Code](https://code.visualstudio.com/).
